@@ -93,7 +93,7 @@
    * @param {Array} elements - of the tuple
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a record described by fields
+   * @return {Boolean} if subject is a tuple described by elements
    */
   function isTuple (elements, subject) {
     return isArray(subject) &&
