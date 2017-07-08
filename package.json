@@ -1,0 +1,53 @@
+{
+  "name": "fun-type",
+  "version": "0.1.0",
+  "description": "Functions for working with types functionally",
+  "main": "src/index.js",
+  "browser": "dist/bundle.js",
+  "scripts": {
+    "pretest": "npm run lint",
+    "test": "tap -Rtap --coverage-report=text-summary ./test/index.js",
+    "coverage": "tap --coverage-report=lcov ./test/index.js",
+    "predependencies": "mkdir -p img",
+    "dependencies": "madge src --image img/dependencies.svg -x 'public|test|coverage|docs' --include-npm",
+    "postdependencies": "npm run dependencies-test",
+    "dependencies-test": "madge . --image img/dependencies-test.svg -x 'dist|public|coverage|docs' --include-npm",
+    "pages-index": "showdown makehtml -i README.md -o public/index.html",
+    "pages": "./script/pages.sh",
+    "lint": "eslint --ignore-path .gitignore --fix . --ignore-pattern dist",
+    "predocument": "rm -rf docs",
+    "document": "jsdoc -c .jsdoc.json",
+    "browserify": "browserify dist/entry.js --no-bf | uglifyjs > dist/bundle.js",
+    "readme": "cat readme/* > README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/bagrounds/fun-type.git"
+  },
+  "author": "bagrounds@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/bagrounds/fun-type/issues"
+  },
+  "homepage": "https://gitlab.com/bagrounds/fun-type#README",
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "docdash": "^0.4.0",
+    "eslint": "^4.1.1",
+    "fun-arrange": "^0.1.4",
+    "fun-test": "^0.24.1",
+    "fun-test-runner": "^0.9.1",
+    "jsdoc": "^3.4.3",
+    "madge": "^1.6.0",
+    "tap": "^10.7.0",
+    "uglify-js": "^3.0.24"
+  },
+  "dependencies": {
+    "fun-array": "^0.8.1",
+    "fun-boolean": "^0.3.2",
+    "fun-function": "^0.9.1",
+    "fun-object": "^0.6.3",
+    "fun-predicate": "^0.16.0",
+    "guarded": "^0.7.3"
+  }
+}
