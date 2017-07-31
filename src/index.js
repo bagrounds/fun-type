@@ -6,7 +6,6 @@
   'use strict'
 
   /* imports */
-  var predicate = require('fun-predicate')
   var array = require('fun-array')
   var fn = require('fun-function')
   var object = require('fun-object')
@@ -28,18 +27,27 @@
     isArrayOf: isArrayOf
   }
 
-  function isRecordDescription (x) {
-    return predicate.or(
-      isFunction,
-      fn.curry(isObjectOf)(isRecordDescription)
-    )(x)
-  }
+  var firstIsArrayOfFunctions = array.ap([
+    fn.compose(
+      bool.all,
+      array.map(isFunction)
+    )
+  ])
+
+  var firstIsObjectOfFunctions = array.ap([
+    fn.composeAll([
+      bool.all,
+      object.values,
+      object.map(isFunction)
+    ])
+  ])
 
   var guards = {
-    isRecord: guarded(
-      fn.curry(isTuple)([isRecordDescription, predicate.t]),
-      isBoolean
-    )
+    isRecord: guarded(firstIsObjectOfFunctions, isBoolean),
+    hasFields: guarded(firstIsObjectOfFunctions, isBoolean),
+    isTuple: guarded(firstIsArrayOfFunctions, isBoolean),
+    isObjectOf: guarded(array.ap([isFunction]), isBoolean),
+    isArrayOf: guarded(array.ap([isFunction]), isBoolean)
   }
 
   /* exports */
@@ -57,11 +65,12 @@
   function hasFields (fields, subject) {
     return isObject(subject) &&
       bool.all(
-        Object.keys(fields).map(function (key) {
-          return isObject(fields[key])
-            ? module.exports.isRecord(fields[key], subject[key])
-            : fields[key](subject[key])
-        })
+        object.values(
+          object.ap(
+            fields,
+            object.keep(object.keys(fields), subject)
+          )
+        )
       )
   }
 
@@ -75,15 +84,8 @@
    * @return {Boolean} if subject is a record described by fields
    */
   function isRecord (fields, subject) {
-    return isObject(subject) &&
-      Object.keys(fields).length === Object.keys(subject).length &&
-      bool.all(
-        Object.keys(fields).map(function (key) {
-          return isObject(fields[key])
-            ? module.exports.isRecord(fields[key], subject[key])
-            : fields[key](subject[key])
-        })
-      )
+    return hasFields(fields, subject) &&
+      Object.keys(fields).length === Object.keys(subject).length
   }
 
   /**

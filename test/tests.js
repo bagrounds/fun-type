@@ -25,12 +25,6 @@
     b: isStr
   }
 
-  var aObjBStr = {
-    a: {
-      b: isStr
-    }
-  }
-
   var boolNumStr = [isBool, isNum, isStr]
 
   var tests = [
@@ -50,9 +44,7 @@
     [
       [[abNumString, { a: 4, b: '4' }], true],
       [[abNumString, { a: 4, b: '4', c: 'xtra' }], true],
-      [[abNumString, { a: '4', b: '4' }], false],
-      [[aObjBStr, { a: { b: '4' }, b: 3 }], true],
-      [[aObjBStr, { a: { b: 4 }, b: 3 }], false]
+      [[abNumString, { a: '4', b: '4' }], false]
     ].map(array.append('hasFields')),
     [
       [[boolNumStr, [true, 4, '4']], true],
@@ -62,9 +54,7 @@
     [
       [[abNumString, { a: 4, b: '4' }], true],
       [[abNumString, { a: 4, b: '4', c: 'xtra' }], false],
-      [[abNumString, { a: '4', b: '4' }], false],
-      [[aObjBStr, { a: { b: '4' } }], true],
-      [[aObjBStr, { a: { b: '4' }, b: 3 }], false]
+      [[abNumString, { a: '4', b: '4' }], false]
     ].map(array.append('isRecord')),
     [
       [[true], true],
