@@ -26,7 +26,8 @@
     isObjectOf: isObjectOf,
     isArrayOf: isArrayOf,
     isRegExp: isRegExp,
-    instanceOf: instanceOf
+    instanceOf: instanceOf,
+    any: any
   }
 
   var firstIsArrayOfFunctions = array.ap([
@@ -60,7 +61,8 @@
     isObjectOf: guarded(array.ap([isFunction]), isBoolean),
     isArrayOf: guarded(array.ap([isFunction]), isBoolean),
     isRegExp: anyToBool,
-    instanceOf: anyToBool
+    instanceOf: anyToBool,
+    any: anyToBool
   }
 
   /* exports */
@@ -251,6 +253,18 @@
    */
   function isString (subject) {
     return typeof subject === 'string'
+  }
+
+  /**
+   *
+   * @function module:fun-type.any
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} true
+   */
+  function any (subject) {
+    return true
   }
 })()
 

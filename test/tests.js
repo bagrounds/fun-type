@@ -130,7 +130,20 @@
       [[Error, RegExp('e')], false],
       [[Error, Error()], true],
       [[RegExp, Error()], false]
-    ].map(array.append('instanceOf'))
+    ].map(array.append('instanceOf')),
+    [
+      [[Array, 0], true],
+      [[String, '1'], true],
+      [[Date, null], true],
+      [[RegExp, undefined], true],
+      [[Array, []], true],
+      [[Error, {}], true],
+      [[RegExp, /[0-9]+/g], true],
+      [[RegExp, RegExp('e')], true],
+      [[Error, RegExp('e')], true],
+      [[Error, Error()], true],
+      [[RegExp, Error()], true]
+    ].map(array.append('any'))
   ].reduce(array.concat, [])
     .map(arrange({ inputs: 0, predicate: 1, contra: 2 }))
     .map(object.ap({
