@@ -106,7 +106,31 @@
       [[[]], true],
       [[{}], false],
       [[new Error()], false]
-    ].map(array.append('isArray'))
+    ].map(array.append('isArray')),
+    [
+      [[RegExp('[0-9]+', 'g')], true],
+      [[/[0-9]+/g], true],
+      [[0], false],
+      [['1'], false],
+      [[null], false],
+      [[], false],
+      [[[]], false],
+      [[{}], false],
+      [[new Error()], false]
+    ].map(array.append('isRegExp')),
+    [
+      [[Array, 0], false],
+      [[String, '1'], false],
+      [[Date, null], false],
+      [[RegExp, undefined], false],
+      [[Array, []], true],
+      [[Error, {}], false],
+      [[RegExp, /[0-9]+/g], true],
+      [[RegExp, RegExp('e')], true],
+      [[Error, RegExp('e')], false],
+      [[Error, Error()], true],
+      [[RegExp, Error()], false]
+    ].map(array.append('instanceOf'))
   ].reduce(array.concat, [])
     .map(arrange({ inputs: 0, predicate: 1, contra: 2 }))
     .map(object.ap({

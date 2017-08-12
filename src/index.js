@@ -24,7 +24,9 @@
     hasFields: hasFields,
     isTuple: isTuple,
     isObjectOf: isObjectOf,
-    isArrayOf: isArrayOf
+    isArrayOf: isArrayOf,
+    isRegExp: isRegExp,
+    instanceOf: instanceOf
   }
 
   var firstIsArrayOfFunctions = array.ap([
@@ -52,6 +54,31 @@
 
   /* exports */
   module.exports = object.map(fn.curry, object.ap(guards, api))
+
+  /**
+   *
+   * @function module:fun-type.instanceOf
+   *
+   * @param {Function} constructor - defining instance
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is instanceof constructor
+   */
+  function instanceOf (constructor, subject) {
+    return subject instanceof constructor
+  }
+
+  /**
+   *
+   * @function module:fun-type.isRegExp
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a RegExp
+   */
+  function isRegExp (subject) {
+    return instanceOf(RegExp, subject)
+  }
 
   /**
    *
@@ -164,7 +191,7 @@
    * @return {Boolean} if subject is an array
    */
   function isArray (subject) {
-    return subject instanceof Array
+    return instanceOf(Array, subject)
   }
 
   /**
