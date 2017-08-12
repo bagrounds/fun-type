@@ -44,12 +44,23 @@
     ])
   ])
 
+  var anyToBool = guarded(bool.t, isBoolean)
+
   var guards = {
+    isBoolean: anyToBool,
+    isNumber: anyToBool,
+    isString: anyToBool,
+    isObject: anyToBool,
+    isPojo: anyToBool,
+    isArray: anyToBool,
+    isFunction: anyToBool,
     isRecord: guarded(firstIsObjectOfFunctions, isBoolean),
     hasFields: guarded(firstIsObjectOfFunctions, isBoolean),
     isTuple: guarded(firstIsArrayOfFunctions, isBoolean),
     isObjectOf: guarded(array.ap([isFunction]), isBoolean),
-    isArrayOf: guarded(array.ap([isFunction]), isBoolean)
+    isArrayOf: guarded(array.ap([isFunction]), isBoolean),
+    isRegExp: anyToBool,
+    instanceOf: anyToBool
   }
 
   /* exports */
