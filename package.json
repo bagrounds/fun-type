@@ -1,6 +1,6 @@
 {
   "name": "fun-type",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Functions for working with types functionally",
   "main": "src/index.js",
   "browser": "dist/bundle.js",
