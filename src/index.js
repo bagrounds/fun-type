@@ -227,9 +227,9 @@
    * @return {Boolean} if subject is a matrix
    */
   function matrixOf (predicate, subject) {
-    return array(subject) &&
+    return matrix(subject) &&
       arrayOf(
-        vectorOf.bind(null, subject[0].length, predicate),
+        fn.curry(vectorOf)(subject[0].length, predicate),
         subject
       )
   }
@@ -244,6 +244,8 @@
    */
   function matrix (subject) {
     return array(subject) &&
+      funArray.length(subject) > 0 &&
+      arrayOf(array, subject) &&
       arrayOf(vector.bind(null, subject[0].length), subject)
   }
 

@@ -28,6 +28,16 @@
   var boolNumStr = [isBool, isNum, isStr]
 
   var adHocTests = [
+    function degenerateMatrixOf (subject, callback) {
+      var result, error
+      try {
+        result = subject.matrixOf(subject.num, []) === false
+      } catch (e) {
+        error = e
+      }
+
+      callback(error, result)
+    },
     function nestedVectorOf (subject, callback) {
       var result, error
       try {
