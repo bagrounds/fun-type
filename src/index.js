@@ -19,12 +19,16 @@
     object: object,
     pojo: pojo,
     array: array,
+    vector: vector,
+    matrix: matrix,
     fun: fun,
     record: record,
     hasFields: hasFields,
     tuple: tuple,
     objectOf: objectOf,
     arrayOf: arrayOf,
+    vectorOf: vectorOf,
+    matrixOf: matrixOf,
     regExp: regExp,
     instanceOf: instanceOf,
     any: any
@@ -54,12 +58,15 @@
     object: anyToBool,
     pojo: anyToBool,
     array: anyToBool,
+    vector: guarded(fn.curry(tuple)([num, any]), bool),
     fun: anyToBool,
     record: guarded(firstIsObjectOfFunctions, bool),
     hasFields: guarded(firstIsObjectOfFunctions, bool),
     tuple: guarded(firstIsArrayOfFunctions, bool),
     objectOf: guarded(funArray.ap([fun]), bool),
     arrayOf: guarded(funArray.ap([fun]), bool),
+    vectorOf: guarded(fn.curry(tuple)([num, fun, any]), bool),
+    matrixOf: guarded(fn.curry(tuple)([fun, any]), bool),
     regExp: anyToBool,
     instanceOf: anyToBool,
     any: anyToBool
@@ -193,6 +200,63 @@
    */
   function object (subject) {
     return typeof subject === 'object' && subject !== null
+  }
+
+  /**
+   *
+   * @function module:fun-type.vectorOf
+   *
+   * @param {Number} length - of vector
+   * @param {Function} predicate - to check type of each value in subject
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is an array
+   */
+  function vectorOf (length, predicate, subject) {
+    return vector(length, subject) && arrayOf(predicate, subject)
+  }
+
+  /**
+   *
+   * @function module:fun-type.matrixOf
+   *
+   * @param {Function} predicate - to check type of each value in subject
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a matrix
+   */
+  function matrixOf (predicate, subject) {
+    return array(subject) &&
+      arrayOf(
+        vectorOf.bind(null, subject[0].length, predicate),
+        subject
+      )
+  }
+
+  /**
+   *
+   * @function module:fun-type.matrix
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a matrix
+   */
+  function matrix (subject) {
+    return array(subject) &&
+      arrayOf(vector.bind(null, subject[0].length), subject)
+  }
+
+  /**
+   *
+   * @function module:fun-type.vector
+   *
+   * @param {Number} length - of vector
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is an array
+   */
+  function vector (length, subject) {
+    return array(subject) && subject.length === length
   }
 
   /**

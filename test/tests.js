@@ -29,6 +29,30 @@
 
   var tests = [
     [
+      [[isNum, [[0, '0'], [0, 1]]], false],
+      [[isNum, [[0, 0], [0, 1]]], true],
+      [[isNum, [[0], [0, 1]]], false],
+      [[isNum, [[], [1]]], false],
+      [[isNum, [[], []]], true],
+      [[isNum, [[]]], true]
+    ].map(array.append('matrixOf')),
+    [
+      [[[[0, 0], [0, 1]]], true],
+      [[[[0], [0, 1]]], false],
+      [[[[], [1]]], false],
+      [[[[], []]], true],
+      [[[[]]], true]
+    ].map(array.append('matrix')),
+    [
+      [[2, isNum, [4, 3]], true],
+      [[3, isNum, [4, 3]], false],
+      [[3, isNum, [4, 3, -4.3]], true],
+      [[3, isNum, [4, '3', -4.3]], false],
+      [[3, isStr, ['4', 'hi']], false],
+      [[2, isStr, ['4', 'hi']], true],
+      [[2, isStr, [4, 'hi']], false]
+    ].map(array.append('vectorOf')),
+    [
       [[isNum, [4, 3]], true],
       [[isNum, [4, 3, -4.3]], true],
       [[isNum, [4, '3', -4.3]], false],
