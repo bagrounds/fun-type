@@ -174,7 +174,8 @@
    * @return {Boolean} if each element in subject passes predicate
    */
   function arrayOf (predicate, subject) {
-    return array(subject) && funBool.all(subject.map(predicate))
+    return array(subject) &&
+      funBool.all(funArray.map(predicate, subject))
   }
 
   /**

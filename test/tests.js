@@ -27,6 +27,25 @@
 
   var boolNumStr = [isBool, isNum, isStr]
 
+  var adHocTests = [
+    function nestedVectorOf (subject, callback) {
+      var result, error
+      try {
+        result = subject.vectorOf(
+          2,
+          subject.vectorOf(
+            1,
+            subject.num
+          )
+        )([[1], [2]]) === true
+      } catch (e) {
+        error = e
+      }
+
+      callback(error, result)
+    }
+  ]
+
   var tests = [
     [
       [[isNum, [[0, '0'], [0, 1]]], false],
@@ -176,6 +195,6 @@
     }))
 
   /* exports */
-  module.exports = tests.map(funTest.sync)
+  module.exports = tests.map(funTest.sync).concat(adHocTests)
 })()
 
