@@ -6,67 +6,67 @@
   'use strict'
 
   /* imports */
-  var array = require('fun-array')
+  var funArray = require('fun-array')
   var fn = require('fun-function')
-  var object = require('fun-object')
+  var funObject = require('fun-object')
   var guarded = require('guarded')
-  var bool = require('fun-boolean')
+  var funBool = require('fun-boolean')
 
   var api = {
-    isBoolean: isBoolean,
-    isNumber: isNumber,
-    isString: isString,
-    isObject: isObject,
-    isPojo: isPojo,
-    isArray: isArray,
-    isFunction: isFunction,
-    isRecord: isRecord,
+    bool: bool,
+    num: num,
+    string: string,
+    object: object,
+    pojo: pojo,
+    array: array,
+    fun: fun,
+    record: record,
     hasFields: hasFields,
-    isTuple: isTuple,
-    isObjectOf: isObjectOf,
-    isArrayOf: isArrayOf,
-    isRegExp: isRegExp,
+    tuple: tuple,
+    objectOf: objectOf,
+    arrayOf: arrayOf,
+    regExp: regExp,
     instanceOf: instanceOf,
     any: any
   }
 
-  var firstIsArrayOfFunctions = array.ap([
+  var firstIsArrayOfFunctions = funArray.ap([
     fn.compose(
-      bool.all,
-      array.map(isFunction)
+      funBool.all,
+      funArray.map(fun)
     )
   ])
 
-  var firstIsObjectOfFunctions = array.ap([
+  var firstIsObjectOfFunctions = funArray.ap([
     fn.composeAll([
-      bool.all,
-      object.values,
-      object.map(isFunction)
+      funBool.all,
+      funObject.values,
+      funObject.map(fun)
     ])
   ])
 
-  var anyToBool = guarded(bool.t, isBoolean)
+  var anyToBool = guarded(funBool.t, bool)
 
   var guards = {
-    isBoolean: anyToBool,
-    isNumber: anyToBool,
-    isString: anyToBool,
-    isObject: anyToBool,
-    isPojo: anyToBool,
-    isArray: anyToBool,
-    isFunction: anyToBool,
-    isRecord: guarded(firstIsObjectOfFunctions, isBoolean),
-    hasFields: guarded(firstIsObjectOfFunctions, isBoolean),
-    isTuple: guarded(firstIsArrayOfFunctions, isBoolean),
-    isObjectOf: guarded(array.ap([isFunction]), isBoolean),
-    isArrayOf: guarded(array.ap([isFunction]), isBoolean),
-    isRegExp: anyToBool,
+    bool: anyToBool,
+    num: anyToBool,
+    string: anyToBool,
+    object: anyToBool,
+    pojo: anyToBool,
+    array: anyToBool,
+    fun: anyToBool,
+    record: guarded(firstIsObjectOfFunctions, bool),
+    hasFields: guarded(firstIsObjectOfFunctions, bool),
+    tuple: guarded(firstIsArrayOfFunctions, bool),
+    objectOf: guarded(funArray.ap([fun]), bool),
+    arrayOf: guarded(funArray.ap([fun]), bool),
+    regExp: anyToBool,
     instanceOf: anyToBool,
     any: anyToBool
   }
 
   /* exports */
-  module.exports = object.map(fn.curry, object.ap(guards, api))
+  module.exports = funObject.map(fn.curry, funObject.ap(guards, api))
 
   /**
    *
@@ -83,13 +83,13 @@
 
   /**
    *
-   * @function module:fun-type.isRegExp
+   * @function module:fun-type.regExp
    *
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is a RegExp
    */
-  function isRegExp (subject) {
+  function regExp (subject) {
     return instanceOf(RegExp, subject)
   }
 
@@ -103,12 +103,12 @@
    * @return {Boolean} if fields of subject match types described in fields
    */
   function hasFields (fields, subject) {
-    return isObject(subject) &&
-      bool.all(
-        object.values(
-          object.ap(
+    return object(subject) &&
+      funBool.all(
+        funObject.values(
+          funObject.ap(
             fields,
-            object.keep(object.keys(fields), subject)
+            funObject.keep(funObject.keys(fields), subject)
           )
         )
       )
@@ -116,142 +116,142 @@
 
   /**
    *
-   * @function module:fun-type.isRecord
+   * @function module:fun-type.record
    *
    * @param {Object} fields - of the record
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is a record described by fields
    */
-  function isRecord (fields, subject) {
+  function record (fields, subject) {
     return hasFields(fields, subject) &&
       Object.keys(fields).length === Object.keys(subject).length
   }
 
   /**
    *
-   * @function module:fun-type.isTuple
+   * @function module:fun-type.tuple
    *
    * @param {Array} elements - of the tuple
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is a tuple described by elements
    */
-  function isTuple (elements, subject) {
-    return isArray(subject) &&
+  function tuple (elements, subject) {
+    return array(subject) &&
       subject.length === elements.length &&
-      bool.all(array.ap(elements, subject))
+      funBool.all(funArray.ap(elements, subject))
   }
 
   /**
    *
-   * @function module:fun-type.isObjectOf
+   * @function module:fun-type.objectOf
    *
    * @param {Function} predicate - to check type of each value in subject
    * @param {*} subject - to check
    *
    * @return {Boolean} if each enumerable property of subject passes predicate
    */
-  function isObjectOf (predicate, subject) {
-    return isObject(subject) &&
-      bool.all(object.values(subject).map(predicate))
+  function objectOf (predicate, subject) {
+    return object(subject) &&
+      funBool.all(funObject.values(subject).map(predicate))
   }
 
   /**
    *
-   * @function module:fun-type.isArrayOf
+   * @function module:fun-type.arrayOf
    *
    * @param {Function} predicate - to check type of each value in subject
    * @param {*} subject - to check
    *
    * @return {Boolean} if each element in subject passes predicate
    */
-  function isArrayOf (predicate, subject) {
-    return isArray(subject) && bool.all(subject.map(predicate))
+  function arrayOf (predicate, subject) {
+    return array(subject) && funBool.all(subject.map(predicate))
   }
 
   /**
    *
-   * @function module:fun-type.isPojo
+   * @function module:fun-type.pojo
    *
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is a plain old JavaScript object
    */
-  function isPojo (subject) {
-    return isObject(subject) &&
+  function pojo (subject) {
+    return object(subject) &&
       Object.getPrototypeOf(subject) === Object.prototype
   }
 
   /**
    *
-   * @function module:fun-type.isObject
+   * @function module:fun-type.object
    *
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is an object
    */
-  function isObject (subject) {
+  function object (subject) {
     return typeof subject === 'object' && subject !== null
   }
 
   /**
    *
-   * @function module:fun-type.isArray
+   * @function module:fun-type.array
    *
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is an array
    */
-  function isArray (subject) {
+  function array (subject) {
     return instanceOf(Array, subject)
   }
 
   /**
    *
-   * @function module:fun-type.isFunction
+   * @function module:fun-type.fun
    *
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is a function
    */
-  function isFunction (subject) {
+  function fun (subject) {
     return typeof subject === 'function'
   }
 
   /**
    *
-   * @function module:fun-type.isBoolean
+   * @function module:fun-type.bool
    *
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a boolean
+   * @return {Boolean} if subject is a bool
    */
-  function isBoolean (subject) {
+  function bool (subject) {
     return typeof subject === 'boolean'
   }
 
   /**
    *
-   * @function module:fun-type.isNumber
+   * @function module:fun-type.num
    *
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is a number
    */
-  function isNumber (subject) {
+  function num (subject) {
     return typeof subject === 'number'
   }
 
   /**
    *
-   * @function module:fun-type.isString
+   * @function module:fun-type.string
    *
    * @param {*} subject - to check
    *
    * @return {Boolean} if subject is a string
    */
-  function isString (subject) {
+  function string (subject) {
     return typeof subject === 'string'
   }
 

@@ -34,13 +34,13 @@
       [[isNum, [4, '3', -4.3]], false],
       [[isStr, ['4', 'hi']], true],
       [[isStr, [4, 'hi']], false]
-    ].map(array.append('isArrayOf')),
+    ].map(array.append('arrayOf')),
     [
       [[isNum, { a: 4, b: 4 }], true],
       [[isNum, { a: 4, b: '4' }], false],
       [[isBool, { a: true, b: false, c: true }], true],
       [[isBool, { a: 'true', b: false, c: true }], false]
-    ].map(array.append('isObjectOf')),
+    ].map(array.append('objectOf')),
     [
       [[abNumString, { a: 4, b: '4' }], true],
       [[abNumString, { a: 4, b: '4', c: 'xtra' }], true],
@@ -50,12 +50,12 @@
       [[boolNumStr, [true, 4, '4']], true],
       [[boolNumStr, [true, 4, '4', '5']], false],
       [[boolNumStr, [true, '4', '4']], false]
-    ].map(array.append('isTuple')),
+    ].map(array.append('tuple')),
     [
       [[abNumString, { a: 4, b: '4' }], true],
       [[abNumString, { a: 4, b: '4', c: 'xtra' }], false],
       [[abNumString, { a: '4', b: '4' }], false]
-    ].map(array.append('isRecord')),
+    ].map(array.append('record')),
     [
       [[true], true],
       [[false], true],
@@ -64,7 +64,7 @@
       [[null], false],
       [[], false],
       [['true'], false]
-    ].map(array.append('isBoolean')),
+    ].map(array.append('bool')),
     [
       [[0], true],
       [[1], true],
@@ -73,7 +73,7 @@
       [[null], false],
       [[], false],
       [['true'], false]
-    ].map(array.append('isNumber')),
+    ].map(array.append('num')),
     [
       [[true], false],
       [[4], false],
@@ -81,7 +81,7 @@
       [[null], false],
       [[], false],
       [['true'], true]
-    ].map(array.append('isString')),
+    ].map(array.append('string')),
     [
       [[0], false],
       [['1'], false],
@@ -89,7 +89,7 @@
       [[], false],
       [[{}], true],
       [[new Error()], true]
-    ].map(array.append('isObject')),
+    ].map(array.append('object')),
     [
       [[0], false],
       [['1'], false],
@@ -97,7 +97,7 @@
       [[], false],
       [[{}], true],
       [[new Error()], false]
-    ].map(array.append('isPojo')),
+    ].map(array.append('pojo')),
     [
       [[0], false],
       [['1'], false],
@@ -106,7 +106,7 @@
       [[[]], true],
       [[{}], false],
       [[new Error()], false]
-    ].map(array.append('isArray')),
+    ].map(array.append('array')),
     [
       [[RegExp('[0-9]+', 'g')], true],
       [[/[0-9]+/g], true],
@@ -117,7 +117,7 @@
       [[[]], false],
       [[{}], false],
       [[new Error()], false]
-    ].map(array.append('isRegExp')),
+    ].map(array.append('regExp')),
     [
       [[Array, 0], false],
       [[String, '1'], false],
