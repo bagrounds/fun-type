@@ -1,62 +1,48 @@
-;(function () {
+;(() => {
   'use strict'
 
   /* imports */
-  var predicate = require('fun-predicate')
-  var object = require('fun-object')
-  var funTest = require('fun-test')
-  var arrange = require('fun-arrange')
-  var array = require('fun-array')
+  const { equalDeep } = require('fun-predicate')
+  const { ap, get } = require('fun-object')
+  const { sync } = require('fun-test')
+  const arrange = require('fun-arrange')
+  const { append, concat, range } = require('fun-array')
 
-  function isNum (x) {
-    return typeof x === 'number'
-  }
+  const isNum = x => typeof x === 'number'
+  const isStr = x => typeof x === 'string'
+  const isBool = x => typeof x === 'boolean'
 
-  function isStr (x) {
-    return typeof x === 'string'
-  }
-
-  function isBool (x) {
-    return typeof x === 'boolean'
-  }
-
-  var abNumString = {
+  const abNumString = {
     a: isNum,
     b: isStr
   }
 
-  var boolNumStr = [isBool, isNum, isStr]
+  const boolNumStr = [isBool, isNum, isStr]
 
-  var adHocTests = [
+  const adHocTests = [
     function degenerateMatrixOf (subject, callback) {
-      var result, error
       try {
-        result = subject.matrixOf(subject.num, []) === false
+        callback(null, subject.matrixOf(subject.num, []) === false)
       } catch (e) {
-        error = e
+        callback(e)
       }
-
-      callback(error, result)
     },
     function nestedVectorOf (subject, callback) {
-      var result, error
       try {
-        result = subject.vectorOf(
+        callback(null, subject.vectorOf(
           2,
           subject.vectorOf(
             1,
             subject.num
           )
-        )([[1], [2]]) === true
+        )([[1], [2]]) === true)
       } catch (e) {
-        error = e
+        callback(e)
       }
-
-      callback(error, result)
     }
   ]
 
-  var tests = [
+  const tests = [
     [
       [[isNum, [[0, '0'], [0, 1]]], false],
       [[isNum, [[0, 0], [0, 1]]], true],
@@ -64,14 +50,14 @@
       [[isNum, [[], [1]]], false],
       [[isNum, [[], []]], true],
       [[isNum, [[]]], true]
-    ].map(array.append('matrixOf')),
+    ].map(append('matrixOf')),
     [
       [[[[0, 0], [0, 1]]], true],
       [[[[0], [0, 1]]], false],
       [[[[], [1]]], false],
       [[[[], []]], true],
       [[[[]]], true]
-    ].map(array.append('matrix')),
+    ].map(append('matrix')),
     [
       [[2, isNum, [4, 3]], true],
       [[3, isNum, [4, 3]], false],
@@ -80,35 +66,35 @@
       [[3, isStr, ['4', 'hi']], false],
       [[2, isStr, ['4', 'hi']], true],
       [[2, isStr, [4, 'hi']], false]
-    ].map(array.append('vectorOf')),
+    ].map(append('vectorOf')),
     [
       [[isNum, [4, 3]], true],
       [[isNum, [4, 3, -4.3]], true],
       [[isNum, [4, '3', -4.3]], false],
       [[isStr, ['4', 'hi']], true],
       [[isStr, [4, 'hi']], false]
-    ].map(array.append('arrayOf')),
+    ].map(append('arrayOf')),
     [
       [[isNum, { a: 4, b: 4 }], true],
       [[isNum, { a: 4, b: '4' }], false],
       [[isBool, { a: true, b: false, c: true }], true],
       [[isBool, { a: 'true', b: false, c: true }], false]
-    ].map(array.append('objectOf')),
+    ].map(append('objectOf')),
     [
       [[abNumString, { a: 4, b: '4' }], true],
       [[abNumString, { a: 4, b: '4', c: 'xtra' }], true],
       [[abNumString, { a: '4', b: '4' }], false]
-    ].map(array.append('hasFields')),
+    ].map(append('hasFields')),
     [
       [[boolNumStr, [true, 4, '4']], true],
       [[boolNumStr, [true, 4, '4', '5']], false],
       [[boolNumStr, [true, '4', '4']], false]
-    ].map(array.append('tuple')),
+    ].map(append('tuple')),
     [
       [[abNumString, { a: 4, b: '4' }], true],
       [[abNumString, { a: 4, b: '4', c: 'xtra' }], false],
       [[abNumString, { a: '4', b: '4' }], false]
-    ].map(array.append('record')),
+    ].map(append('record')),
     [
       [[true], true],
       [[false], true],
@@ -117,7 +103,7 @@
       [[null], false],
       [[], false],
       [['true'], false]
-    ].map(array.append('bool')),
+    ].map(append('bool')),
     [
       [[0], true],
       [[1], true],
@@ -126,7 +112,7 @@
       [[null], false],
       [[], false],
       [['true'], false]
-    ].map(array.append('num')),
+    ].map(append('num')),
     [
       [[true], false],
       [[4], false],
@@ -134,7 +120,7 @@
       [[null], false],
       [[], false],
       [['true'], true]
-    ].map(array.append('string')),
+    ].map(append('string')),
     [
       [[0], false],
       [['1'], false],
@@ -142,7 +128,7 @@
       [[], false],
       [[{}], true],
       [[new Error()], true]
-    ].map(array.append('object')),
+    ].map(append('object')),
     [
       [[0], false],
       [['1'], false],
@@ -150,7 +136,7 @@
       [[], false],
       [[{}], true],
       [[new Error()], false]
-    ].map(array.append('pojo')),
+    ].map(append('pojo')),
     [
       [[0], false],
       [['1'], false],
@@ -159,7 +145,7 @@
       [[[]], true],
       [[{}], false],
       [[new Error()], false]
-    ].map(array.append('array')),
+    ].map(append('array')),
     [
       [[RegExp('[0-9]+', 'g')], true],
       [[/[0-9]+/g], true],
@@ -170,7 +156,7 @@
       [[[]], false],
       [[{}], false],
       [[new Error()], false]
-    ].map(array.append('regExp')),
+    ].map(append('regExp')),
     [
       [[Array, 0], false],
       [[String, '1'], false],
@@ -183,28 +169,47 @@
       [[Error, RegExp('e')], false],
       [[Error, Error()], true],
       [[RegExp, Error()], false]
-    ].map(array.append('instanceOf')),
+    ].map(append('instanceOf')),
     [
-      [[Array, 0], true],
-      [[String, '1'], true],
-      [[Date, null], true],
-      [[RegExp, undefined], true],
-      [[Array, []], true],
-      [[Error, {}], true],
-      [[RegExp, /[0-9]+/g], true],
-      [[RegExp, RegExp('e')], true],
-      [[Error, RegExp('e')], true],
-      [[Error, Error()], true],
-      [[RegExp, Error()], true]
-    ].map(array.append('any'))
-  ].reduce(array.concat, [])
+      [[0], true],
+      [['1'], true],
+      [[null], true],
+      [[undefined], true],
+      [[[]], true],
+      [[{}], true],
+      [[/[0-9]+/g], true],
+      [[RegExp('e')], true],
+      [[Error()], true]
+    ].map(append('any')),
+    [
+      [[equalDeep, range(1, 8), 0], false],
+      [[equalDeep, range(1, 8), 1], true],
+      [[equalDeep, range(1, 8), 2], true],
+      [[equalDeep, range(1, 8), 8], true],
+      [[equalDeep, range(1, 8), 9], false],
+      [[equalDeep, [{ a: 1 }, { b: 2 }], { a: 1 }], true],
+      [[equalDeep, [{ a: 1 }, { b: 2 }], { a: 2 }], false]
+    ].map(append('member')),
+    [
+      [[1], true],
+      [[1.00], true],
+      [[123], true],
+      [[-123], true],
+      [[0], true],
+      [[0.1], false],
+      [[-0.1], false],
+      [[Infinity], false],
+      [[-Infinity], false],
+      [[NaN], false]
+    ].map(append('integer'))
+  ].reduce(concat, [])
     .map(arrange({ inputs: 0, predicate: 1, contra: 2 }))
-    .map(object.ap({
-      predicate: predicate.equalDeep,
-      contra: object.get
+    .map(ap({
+      predicate: equalDeep,
+      contra: get
     }))
 
   /* exports */
-  module.exports = tests.map(funTest.sync).concat(adHocTests)
+  module.exports = tests.map(sync).concat(adHocTests)
 })()
 

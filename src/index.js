@@ -2,78 +2,78 @@
  *
  * @module fun-type
  */
-;(function () {
+;(() => {
   'use strict'
 
   /* imports */
-  var funArray = require('fun-array')
-  var fn = require('fun-function')
-  var funObject = require('fun-object')
-  var guarded = require('guarded')
-  var funBool = require('fun-boolean')
+  const curry = require('fun-curry')
+  const { keys, values, keep, ap: oAp, map: oMap } = require('fun-object')
+  const { inputs, output } = require('guarded')
 
-  var api = {
-    bool: bool,
-    num: num,
-    string: string,
-    object: object,
-    pojo: pojo,
-    array: array,
-    vector: vector,
-    matrix: matrix,
-    fun: fun,
-    record: record,
-    hasFields: hasFields,
-    tuple: tuple,
-    objectOf: objectOf,
-    arrayOf: arrayOf,
-    vectorOf: vectorOf,
-    matrixOf: matrixOf,
-    regExp: regExp,
-    instanceOf: instanceOf,
-    any: any
-  }
+  const all = as => as.reduce((a, b) => a && b, true)
+  const compose = f => g => x => f(g(x))
+  const typeOf = t => x => typeof x === t
 
-  var firstIsArrayOfFunctions = funArray.ap([
-    fn.compose(
-      funBool.all,
-      funArray.map(fun)
-    )
-  ])
+  /**
+   *
+   * @function module:fun-type.any
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} true
+   */
+  const any = () => true
 
-  var firstIsObjectOfFunctions = funArray.ap([
-    fn.composeAll([
-      funBool.all,
-      funObject.values,
-      funObject.map(fun)
-    ])
-  ])
+  /**
+   *
+   * @function module:fun-type.bool
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a bool
+   */
+  const bool = typeOf('boolean')
 
-  var anyToBool = guarded(funBool.t, bool)
+  /**
+   *
+   * @function module:fun-type.integer
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a finite integer
+   */
+  const integer = subject => num(subject) && Math.floor(subject) === subject &&
+    Math.abs(subject) !== Infinity
 
-  var guards = {
-    bool: anyToBool,
-    num: anyToBool,
-    string: anyToBool,
-    object: anyToBool,
-    pojo: anyToBool,
-    array: anyToBool,
-    vector: guarded(fn.curry(tuple)([num, any]), bool),
-    fun: anyToBool,
-    record: guarded(firstIsObjectOfFunctions, bool),
-    hasFields: guarded(firstIsObjectOfFunctions, bool),
-    tuple: guarded(firstIsArrayOfFunctions, bool),
-    objectOf: guarded(funArray.ap([fun]), bool),
-    arrayOf: guarded(funArray.ap([fun]), bool),
-    vectorOf: guarded(fn.curry(tuple)([num, fun, any]), bool),
-    matrixOf: guarded(fn.curry(tuple)([fun, any]), bool),
-    regExp: anyToBool,
-    instanceOf: anyToBool,
-    any: anyToBool
-  }
+  /**
+   *
+   * @function module:fun-type.num
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a number
+   */
+  const num = typeOf('number')
 
-  /* exports */
-  module.exports = funObject.map(fn.curry, funObject.ap(guards, api))
+  /**
+   *
+   * @function module:fun-type.string
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a string
+   */
+  const string = typeOf('string')
+
+  /**
+   *
+   * @function module:fun-type.fun
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a function
+   */
+  const fun = typeOf('function')
 
   /**
    *
@@ -84,85 +84,17 @@
    *
    * @return {Boolean} if subject is instanceof constructor
    */
-  function instanceOf (constructor, subject) {
-    return subject instanceof constructor
-  }
+  const instanceOf = (constructor, subject) => subject instanceof constructor
 
   /**
    *
-   * @function module:fun-type.regExp
+   * @function module:fun-type.array
    *
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a RegExp
+   * @return {Boolean} if subject is an array
    */
-  function regExp (subject) {
-    return instanceOf(RegExp, subject)
-  }
-
-  /**
-   *
-   * @function module:fun-type.hasFields
-   *
-   * @param {Object} fields - that subject must have
-   * @param {*} subject - to check
-   *
-   * @return {Boolean} if fields of subject match types described in fields
-   */
-  function hasFields (fields, subject) {
-    return object(subject) &&
-      funBool.all(
-        funObject.values(
-          funObject.ap(
-            fields,
-            funObject.keep(funObject.keys(fields), subject)
-          )
-        )
-      )
-  }
-
-  /**
-   *
-   * @function module:fun-type.record
-   *
-   * @param {Object} fields - of the record
-   * @param {*} subject - to check
-   *
-   * @return {Boolean} if subject is a record described by fields
-   */
-  function record (fields, subject) {
-    return hasFields(fields, subject) &&
-      Object.keys(fields).length === Object.keys(subject).length
-  }
-
-  /**
-   *
-   * @function module:fun-type.tuple
-   *
-   * @param {Array} elements - of the tuple
-   * @param {*} subject - to check
-   *
-   * @return {Boolean} if subject is a tuple described by elements
-   */
-  function tuple (elements, subject) {
-    return array(subject) &&
-      subject.length === elements.length &&
-      funBool.all(funArray.ap(elements, subject))
-  }
-
-  /**
-   *
-   * @function module:fun-type.objectOf
-   *
-   * @param {Function} predicate - to check type of each value in subject
-   * @param {*} subject - to check
-   *
-   * @return {Boolean} if each enumerable property of subject passes predicate
-   */
-  function objectOf (predicate, subject) {
-    return object(subject) &&
-      funBool.all(funObject.values(subject).map(predicate))
-  }
+  const array = curry(instanceOf)(Array)
 
   /**
    *
@@ -173,35 +105,20 @@
    *
    * @return {Boolean} if each element in subject passes predicate
    */
-  function arrayOf (predicate, subject) {
-    return array(subject) &&
-      funBool.all(funArray.map(predicate, subject))
-  }
+  const arrayOf = (predicate, subject) => array(subject) &&
+    all(subject.map(x => predicate(x)))
 
   /**
    *
-   * @function module:fun-type.pojo
+   * @function module:fun-type.vector
    *
+   * @param {Number} length - of vector
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a plain old JavaScript object
+   * @return {Boolean} if subject is an array
    */
-  function pojo (subject) {
-    return object(subject) &&
-      Object.getPrototypeOf(subject) === Object.prototype
-  }
-
-  /**
-   *
-   * @function module:fun-type.object
-   *
-   * @param {*} subject - to check
-   *
-   * @return {Boolean} if subject is an object
-   */
-  function object (subject) {
-    return typeof subject === 'object' && subject !== null
-  }
+  const vector = (length, subject) =>
+    array(subject) && subject.length === length
 
   /**
    *
@@ -213,9 +130,32 @@
    *
    * @return {Boolean} if subject is an array
    */
-  function vectorOf (length, predicate, subject) {
-    return vector(length, subject) && arrayOf(predicate, subject)
-  }
+  const vectorOf = (length, predicate, subject) =>
+    vector(length, subject) && arrayOf(predicate, subject)
+
+  /**
+   *
+   * @function module:fun-type.tuple
+   *
+   * @param {Array} elements - of the tuple
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a tuple described by elements
+   */
+  const tuple = (elements, subject) => vector(elements.length, subject) &&
+    all(elements.map((p, i) => p(subject[i])))
+
+  /**
+   *
+   * @function module:fun-type.matrix
+   *
+   * @param {*} subject - to check
+   *
+   * @return {Boolean} if subject is a matrix
+   */
+  const matrix = subject => array(subject) &&
+    subject.length > 0 &&
+    arrayOf(curry(vector)(subject[0].length), subject)
 
   /**
    *
@@ -226,112 +166,117 @@
    *
    * @return {Boolean} if subject is a matrix
    */
-  function matrixOf (predicate, subject) {
-    return matrix(subject) &&
-      arrayOf(
-        fn.curry(vectorOf)(subject[0].length, predicate),
-        subject
-      )
-  }
+  const matrixOf = (predicate, subject) => matrix(subject) &&
+    arrayOf(curry(vectorOf)(subject[0].length, predicate), subject)
 
   /**
    *
-   * @function module:fun-type.matrix
+   * @function module:fun-type.object
    *
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a matrix
+   * @return {Boolean} if subject is an object
    */
-  function matrix (subject) {
-    return array(subject) &&
-      funArray.length(subject) > 0 &&
-      arrayOf(array, subject) &&
-      arrayOf(vector.bind(null, subject[0].length), subject)
-  }
+  const object = subject => typeOf('object')(subject) && subject !== null
 
   /**
    *
-   * @function module:fun-type.vector
+   * @function module:fun-type.objectOf
    *
-   * @param {Number} length - of vector
+   * @param {Function} predicate - to check type of each value in subject
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is an array
+   * @return {Boolean} if each enumerable property of subject passes predicate
    */
-  function vector (length, subject) {
-    return array(subject) && subject.length === length
-  }
+  const objectOf = (predicate, subject) => object(subject) &&
+    all(values(subject).map(predicate))
 
   /**
    *
-   * @function module:fun-type.array
+   * @function module:fun-type.hasFields
    *
+   * @param {Object} fields - that subject must have
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is an array
+   * @return {Boolean} if fields of subject match types described in fields
    */
-  function array (subject) {
-    return instanceOf(Array, subject)
-  }
+  const hasFields = (fields, subject) => object(subject) &&
+    all(values(oAp(fields, keep(keys(fields), subject))))
 
   /**
    *
-   * @function module:fun-type.fun
+   * @function module:fun-type.record
    *
+   * @param {Object} fields - of the record
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a function
+   * @return {Boolean} if subject is a record described by fields
    */
-  function fun (subject) {
-    return typeof subject === 'function'
-  }
+  const record = (fields, subject) => hasFields(fields, subject) &&
+    vector(keys(fields).length, keys(subject))
 
   /**
    *
-   * @function module:fun-type.bool
+   * @function module:fun-type.pojo
    *
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a bool
+   * @return {Boolean} if subject is a plain old JavaScript object
    */
-  function bool (subject) {
-    return typeof subject === 'boolean'
-  }
+  const pojo = subject => object(subject) &&
+    Object.getPrototypeOf(subject) === Object.prototype
 
   /**
    *
-   * @function module:fun-type.num
+   * @function module:fun-type.regExp
    *
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a number
+   * @return {Boolean} if subject is a RegExp
    */
-  function num (subject) {
-    return typeof subject === 'number'
-  }
+  const regExp = curry(instanceOf)(RegExp)
 
   /**
    *
-   * @function module:fun-type.string
+   * @function module:fun-type.member
    *
+   * @param {Function} equal - (a, b) -> bool
+   * @param {Array} set - that subject should be a member of
    * @param {*} subject - to check
    *
-   * @return {Boolean} if subject is a string
+   * @return {Boolean} if subject is a member of set based on equal function
    */
-  function string (subject) {
-    return typeof subject === 'string'
-  }
+  const member = (equal, set, subject) =>
+    set.reduce((a, b) => a || equal(b, subject), false)
 
-  /**
-   *
-   * @function module:fun-type.any
-   *
-   * @param {*} subject - to check
-   *
-   * @return {Boolean} true
-   */
-  function any (subject) {
-    return true
-  }
+  const api = { bool, num, string, object, pojo, array, vector, matrix, fun,
+    record, hasFields, tuple, objectOf, arrayOf, vectorOf, matrixOf, regExp,
+    instanceOf, any, member, integer }
+
+  const guards = oMap(compose(output(bool)), oMap(inputs, {
+    bool: curry(vector)(1),
+    num: curry(vector)(1),
+    integer: curry(vector)(1),
+    string: curry(vector)(1),
+    object: curry(vector)(1),
+    pojo: curry(vector)(1),
+    array: curry(vector)(1),
+    vector: curry(tuple)([num, any]),
+    fun: curry(vector)(1),
+    record: curry(tuple)([curry(objectOf)(fun), any]),
+    hasFields: curry(tuple)([curry(objectOf)(fun), any]),
+    tuple: curry(tuple)([curry(arrayOf)(fun), any]),
+    objectOf: curry(tuple)([fun, any]),
+    arrayOf: curry(tuple)([fun, any]),
+    vectorOf: curry(tuple)([num, fun, any]),
+    matrixOf: curry(tuple)([fun, any]),
+    regExp: curry(vector)(1),
+    instanceOf: curry(tuple)([fun, any]),
+    any: curry(vector)(1),
+    member: curry(tuple)([fun, array, any])
+  }))
+
+  /* exports */
+  module.exports = oMap(curry, oAp(guards, api))
 })()
 

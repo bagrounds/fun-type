@@ -17,7 +17,7 @@
     "lint": "eslint --ignore-path .gitignore --fix . --ignore-pattern dist",
     "predocument": "rm -rf docs",
     "document": "jsdoc -c .jsdoc.json",
-    "browserify": "browserify dist/entry.js --no-bf | uglifyjs > dist/bundle.js",
+    "browserify": "browserify dist/entry.js --no-bf | uglifyjs -cm > dist/bundle.js",
     "readme": "cat readme/* > README.md",
     "next-update": "next-update -k true --tldr"
   },
@@ -32,24 +32,23 @@
   },
   "homepage": "https://gitlab.com/bagrounds/fun-type#README",
   "devDependencies": {
-    "browserify": "^14.4.0",
+    "browserify": "15.2.0",
     "docdash": "^0.4.0",
-    "eslint": "4.6.1",
+    "eslint": "4.15.0",
     "fun-arrange": "^0.1.4",
-    "fun-predicate": "^0.16.0",
+    "fun-array": "^0.11.0",
+    "fun-predicate": "^0.17.0",
     "fun-test": "^0.24.1",
-    "fun-test-runner": "^0.9.1",
-    "jsdoc": "3.5.4",
+    "fun-test-runner": "^0.10.0",
+    "jsdoc": "3.5.5",
     "madge": "2.2.0",
-    "next-update": "^3.5.3",
-    "tap": "10.7.2",
-    "uglify-js": "3.0.28"
+    "next-update": "^3.6.0",
+    "tap": "11.0.1",
+    "uglify-js-es6": "^2.8.9"
   },
   "dependencies": {
-    "fun-array": "0.11.0",
-    "fun-boolean": "^0.3.2",
-    "fun-function": "^0.9.1",
-    "fun-object": "^0.6.3",
-    "guarded": "^0.7.3"
+    "fun-curry": "^0.3.3",
+    "fun-object": "^0.7.1",
+    "guarded": "^0.9.0"
   }
 }
