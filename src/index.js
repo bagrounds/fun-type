@@ -189,7 +189,7 @@
    * @return {Boolean} if each enumerable property of subject passes predicate
    */
   const objectOf = (predicate, subject) => object(subject) &&
-    all(values(subject).map(predicate))
+    all(values(subject).map(v => predicate(v)))
 
   /**
    *
