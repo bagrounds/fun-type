@@ -249,31 +249,97 @@
   const member = (equal, set, subject) =>
     set.reduce((a, b) => a || equal(b, subject), false)
 
+  /**
+   *
+   * @function module:fun-type.distinct
+   *
+   * @param {Function} equal - (a, b) -> bool
+   * @param {Array} subject - to check
+   *
+   * @return {Boolean} if all elements in subject are unique
+   */
+  const distinct = (equal, subject) => subject.length < 2 ||
+    !member(equal, subject.slice(1), subject[0]) &&
+    distinct(equal, subject.slice(1))
+
+  /**
+   *
+   * @function module:fun-type.subset
+   *
+   * @param {Function} equal - (a, b) -> bool
+   * @param {Array} set - that subject should be a member of
+   * @param {Array} subject - to check
+   *
+   * @return {Boolean} if all elements in subject are unique
+   */
+  const subset = (equal, set, subject) => !subject.length ||
+    (subject.length <= set.length) &&
+    !member(equal, subject.slice(1), subject[0]) &&
+    member(equal, set, subject[0]) &&
+    subset(equal, set, subject.slice(1))
+
+  /**
+   *
+   * @function module:fun-type.partition
+   *
+   * @param {Function} equal - (a, b) -> bool
+   * @param {Array} set - that subject should be a member of
+   * @param {Array<Array>} subject - to check
+   *
+   * @return {Boolean} if all elements in subject are unique
+   */
+  const partition = (equal, set, subject) =>
+    subject.reduce((a, b) => a.concat(b), []).length === set.length &&
+    subset(equal, set, subject.reduce((a, b) => a.concat(b), []))
+
+  /**
+   *
+   * @function module:fun-type.nPartition
+   *
+   * @param {Function} equal - (a, b) -> bool
+   * @param {Number} n - number of groups set is partitioned into
+   * @param {Array} set - that subject should be a member of
+   * @param {Array<Array>} subject - to check
+   *
+   * @return {Boolean} if all elements in subject are unique
+   */
+  const nPartition = (equal, n, set, subject) => subject.length === n &&
+    partition(equal, set, subject)
+
   const api = { bool, num, string, object, pojo, array, vector, matrix, fun,
     record, hasFields, tuple, objectOf, arrayOf, vectorOf, matrixOf, regExp,
-    instanceOf, any, member, integer }
+    instanceOf, any, member, integer, distinct, subset, partition, nPartition }
+
+  const cVector = curry(vector)
+  const cTuple = curry(tuple)
+  const cArrayOf = curry(arrayOf)
+  const cObjectOf = curry(objectOf)
 
   const guards = oMap(compose(output(bool)), oMap(inputs, {
-    bool: curry(vector)(1),
-    num: curry(vector)(1),
-    integer: curry(vector)(1),
-    string: curry(vector)(1),
-    object: curry(vector)(1),
-    pojo: curry(vector)(1),
-    array: curry(vector)(1),
-    vector: curry(tuple)([num, any]),
-    fun: curry(vector)(1),
-    record: curry(tuple)([curry(objectOf)(fun), any]),
-    hasFields: curry(tuple)([curry(objectOf)(fun), any]),
-    tuple: curry(tuple)([curry(arrayOf)(fun), any]),
-    objectOf: curry(tuple)([fun, any]),
-    arrayOf: curry(tuple)([fun, any]),
-    vectorOf: curry(tuple)([num, fun, any]),
-    matrixOf: curry(tuple)([fun, any]),
-    regExp: curry(vector)(1),
-    instanceOf: curry(tuple)([fun, any]),
-    any: curry(vector)(1),
-    member: curry(tuple)([fun, array, any])
+    bool: cVector(1),
+    num: cVector(1),
+    integer: cVector(1),
+    string: cVector(1),
+    object: cVector(1),
+    pojo: cVector(1),
+    array: cVector(1),
+    vector: cTuple([num, any]),
+    fun: cVector(1),
+    record: cTuple([cObjectOf(fun), any]),
+    hasFields: cTuple([cObjectOf(fun), any]),
+    tuple: cTuple([cArrayOf(fun), any]),
+    objectOf: cTuple([fun, any]),
+    arrayOf: cTuple([fun, any]),
+    vectorOf: cTuple([num, fun, any]),
+    matrixOf: cTuple([fun, any]),
+    regExp: cVector(1),
+    instanceOf: cTuple([fun, any]),
+    any: cVector(1),
+    member: cTuple([fun, array, any]),
+    distinct: cTuple([fun, array]),
+    subset: cTuple([fun, array, array]),
+    partition: cTuple([fun, array, cArrayOf(array)]),
+    nPartition: cTuple([fun, num, array, cArrayOf(array)])
   }))
 
   /* exports */
