@@ -7,9 +7,21 @@
 
   /* imports */
   const curry = require('fun-curry')
-  const { keys, values, keep, ap: oAp, map: oMap } = require('fun-object')
   const { inputs, output } = require('guarded')
 
+  const id = x => x
+  const keys = Object.keys
+  const values = o => keys(o).map(k => o[k])
+  const oMap = (f, o) => keys(o).reduce((r, k) => {
+    r[k] = f(o[k])
+
+    return r
+  }, {})
+  const oAp = (fs, o) => keys(o).reduce((r, k) => {
+    r[k] = (fs[k] || id)(o[k])
+
+    return r
+  }, {})
   const all = as => as.reduce((a, b) => a && b, true)
   const compose = f => g => x => f(g(x))
   const typeOf = t => x => typeof x === t
@@ -201,7 +213,7 @@
    * @return {Boolean} if fields of subject match types described in fields
    */
   const hasFields = (fields, subject) => object(subject) &&
-    all(values(oAp(fields, keep(keys(fields), subject))))
+    keys(fields).reduce((r, k) => r && fields[k](subject[k]), true)
 
   /**
    *
